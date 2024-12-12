@@ -118,15 +118,18 @@ if uploaded_file is not None:
         # Process the data
         processed_data = process_data(uploaded_file)
 
-        # Create the heat map
+        # Create the heat map with circle sizes
         st.write("Geographical Distribution of LinkedIn Connections:")
-        fig = px.choropleth(
+        fig = px.scatter_geo(
             processed_data,
             locations="Country",
             locationmode="country names",
-            color="Connections",
+            size="Connections",
             title="Geographical Spread of LinkedIn Connections (Inferred)",
-            color_continuous_scale="Viridis"
+            color="Connections",
+            size_max=50,  # Maximum circle size
+            color_continuous_scale="Viridis",
+            projection="natural earth"  # Adjust projection type if needed
         )
         st.plotly_chart(fig)
     except ValueError as ve:

@@ -18,13 +18,19 @@ uploaded_file = st.file_uploader("Choose a CSV file", type="csv", key="file_uplo
 if uploaded_file is not None:
     st.write("Uploaded File Preview:")
     try:
-        # Read and display the raw file content
+        # Read and display raw file content
         raw_data = uploaded_file.getvalue()
-        st.text(raw_data.decode("utf-8"))  # Display raw file content as text (debugging)
+        st.text("Raw File Content:")
+        st.text(raw_data.decode("utf-8"))  # Display raw file content
 
-        # Attempt to read the file as a CSV
+        # Try to parse the file as CSV
         data = pd.read_csv(uploaded_file)
+        st.write("Parsed File Content:")
         st.write(data)  # Display parsed data for debugging
+
+        # Check if 'Location' column exists
+        if 'Location' not in data.columns:
+            raise ValueError("The uploaded file does not have a 'Location' column.")
 
         # Process the data
         data = process_data(uploaded_file)

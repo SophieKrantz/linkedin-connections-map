@@ -6,153 +6,128 @@ import io
 
 # Function to process the uploaded data
 def process_data(file):
-    # Comprehensive mapping of countries, major cities, states, and regions
-    location_mapping = {
-        # Countries
-        "Australia": "Australia",
-        "India": "India",
-        "Germany": "Germany",
-        "China": "China",
-        "Japan": "Japan",
-        "United States": "United States",
-        "UK": "United Kingdom",
-        "New Zealand": "New Zealand",
-        "Canada": "Canada",
-        "Brazil": "Brazil",
-        "South Africa": "South Africa",
-        "Russia": "Russia",
-        "France": "France",
-        "Italy": "Italy",
-        "Spain": "Spain",
-        "Mexico": "Mexico",
-        "Indonesia": "Indonesia",
-        "Nigeria": "Nigeria",
+    # Comprehensive mapping of countries and cities
+    countries = [
+        "United States", "United Kingdom", "Canada", "Australia", "Germany", "France", "Italy",
+        "Spain", "China", "Japan", "India", "Russia", "Brazil", "Mexico", "South Africa",
+        "Nigeria", "Kenya", "Argentina", "Chile", "Colombia", "Peru", "Venezuela", "Ecuador",
+        "Turkey", "Saudi Arabia", "United Arab Emirates", "Egypt", "Israel", "Pakistan",
+        "Bangladesh", "Vietnam", "Indonesia", "Malaysia", "Philippines", "Thailand",
+        "South Korea", "New Zealand", "Singapore", "Sweden", "Norway", "Denmark", "Finland",
+        "Netherlands", "Belgium", "Austria", "Switzerland", "Ireland", "Poland", "Portugal",
+        "Czech Republic", "Hungary", "Greece", "Romania", "Bulgaria", "Slovakia", "Slovenia",
+        "Croatia", "Serbia", "Ukraine", "Belarus", "Kazakhstan", "Uzbekistan", "Turkmenistan",
+        "Azerbaijan", "Armenia", "Georgia", "Qatar", "Kuwait", "Bahrain", "Oman", "Jordan",
+        "Lebanon", "Iraq", "Afghanistan", "Morocco", "Algeria", "Tunisia", "Libya", "Sudan",
+        "Ethiopia", "Somalia", "Zimbabwe", "Zambia", "Mozambique", "Angola", "Botswana",
+        "Namibia", "Malawi", "Tanzania", "Uganda", "Rwanda", "Burundi", "Ghana", "Ivory Coast",
+        "Senegal", "Cameroon", "Chad", "Central African Republic", "Gabon", "Equatorial Guinea",
+        "Congo", "Democratic Republic of the Congo", "Sierra Leone", "Liberia", "Guinea",
+        "Mali", "Burkina Faso", "Niger", "Benin", "Togo", "Gambia", "Cape Verde", "Madagascar",
+        "Maldives", "Sri Lanka", "Bhutan", "Nepal", "Myanmar", "Laos", "Cambodia", "Brunei",
+        "East Timor", "Papua New Guinea", "Fiji", "Samoa", "Tonga", "Vanuatu", "Solomon Islands",
+        "Micronesia", "Marshall Islands", "Palau", "Kiribati", "Nauru", "Tuvalu"
+    ]
 
-        # Major Cities
-        "London": "United Kingdom",
-        "Geneva": "Switzerland",
-        "Sydney": "Australia",
-        "Melbourne": "Australia",
-        "Munich": "Germany",
-        "Berlin": "Germany",
-        "Shanghai": "China",
-        "Beijing": "China",
-        "New York": "United States",
-        "Los Angeles": "United States",
-        "Paris": "France",
-        "Rome": "Italy",
-        "Moscow": "Russia",
-        "Tokyo": "Japan",
-        "Rio de Janeiro": "Brazil",
+    cities = [
+        "New York", "London", "Paris", "Tokyo", "Hong Kong", "Beijing", "Shanghai", "Dubai",
+        "Singapore", "Los Angeles", "Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide",
+        "Canberra", "Hobart", "Wellington", "Auckland", "Christchurch", "Hamilton", "Dunedin",
+        "Toronto", "Vancouver", "San Francisco", "Chicago", "Boston", "Madrid", "Barcelona",
+        "Berlin", "Munich", "Frankfurt", "Milan", "Rome", "Naples", "Moscow", "St. Petersburg",
+        "Istanbul", "Cape Town", "Johannesburg", "Buenos Aires", "Santiago", "Bogota", "Lima",
+        "Mexico City", "Guadalajara", "Monterrey", "Rio de Janeiro", "Sao Paulo", "Brasilia",
+        "Lisbon", "Zurich", "Geneva", "Amsterdam", "The Hague", "Stockholm", "Oslo", "Copenhagen",
+        "Helsinki", "Dublin", "Warsaw", "Prague", "Vienna", "Budapest", "Athens", "Belgrade",
+        "Kiev", "Riga", "Tallinn", "Vilnius", "Brussels", "Luxembourg", "Tel Aviv", "Doha",
+        "Riyadh", "Abu Dhabi", "Manama", "Muscat", "Kuwait City", "Amman", "Cairo", "Casablanca",
+        "Lagos", "Nairobi", "Accra", "Addis Ababa", "Dar es Salaam", "Harare", "Kigali",
+        "Maputo", "Luanda", "Algiers", "Tunis", "Baghdad", "Tehran", "Kabul", "Islamabad",
+        "Karachi", "Dhaka", "Colombo", "Kathmandu", "Bangkok", "Ho Chi Minh City", "Hanoi",
+        "Manila", "Jakarta", "Kuala Lumpur", "Seoul", "Busan", "Taipei", "Kyoto", "Osaka",
+        "Nagoya", "Fukuoka", "Sapporo", "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai",
+        "Kolkata", "Pune", "Ahmedabad", "Surat", "Kanpur", "Jaipur", "Lucknow", "Nagpur",
+        "Indore", "Patna", "Bhopal", "Vadodara", "Ludhiana", "Agra", "Thiruvananthapuram",
+        "Coimbatore", "Kochi", "Mysore", "Guwahati", "Shillong", "Panaji", "Port Moresby",
+        "Suva", "Apia", "Tonga", "Port Vila", "Honiara", "Nuku'alofa", "Majuro", "Funafuti",
+        "Fukuoka", "Sendai", "Nagano", "Kobe", "Himeji", "Kyushu", "Vladivostok", "Kaliningrad",
+        "Sarajevo", "Skopje", "Podgorica", "Pristina", "Tirana", "Erevan", "Tbilisi", "Bishkek",
+        "Astana", "Ashgabat", "Ulaanbaatar", "Male", "Tashkent", "Dushanbe"
+    ]
 
-        # States and Regions
-        "California": "United States",
-        "Texas": "United States",
-        "Victoria": "Australia",
-        "Queensland": "Australia",
-        "Bavaria": "Germany",
-        "Ontario": "Canada",
-        "Quebec": "Canada",
+    # Combine countries and cities into location mapping
+    location_mapping = {city: country for city in cities for country in countries}
+
+    location_mapping.update({
         "Africa": "Africa",
-        "Europe": "Europe",
         "Asia": "Asia",
+        "Europe": "Europe",
         "North America": "North America",
         "Latin America": "Latin America",
         "Middle East": "Middle East",
-    }
+        "Oceania": "Oceania"
+    })
 
     try:
-        # Read the raw file content
+        # Read the file content
         raw_data = file.getvalue().decode("utf-8")
-
-        # Split lines to skip metadata notes
         lines = raw_data.splitlines()
-        cleaned_lines = []
         header_found = False
 
-        for line in lines:
-            # Look for the header row starting with "First Name"
-            if not header_found and "First Name" in line:
-                header_found = True  # Header row identified
-            if header_found:
-                cleaned_lines.append(line)  # Keep rows after the header
-
+        cleaned_lines = [line for line in lines if header_found or (header_found := "First Name" in line)]
         if not cleaned_lines:
             raise ValueError("The file does not contain a valid header or data rows.")
 
-        # Convert cleaned lines into a file-like object
+        # Convert to file-like object
         cleaned_csv = io.StringIO("\n".join(cleaned_lines))
-
-        # Read the cleaned CSV
         df = pd.read_csv(cleaned_csv)
 
-        # Ensure the required columns exist
+        # Ensure required columns
         if 'Company' not in df.columns or 'Position' not in df.columns:
-            raise ValueError("The uploaded file does not have the required columns: 'Company' or 'Position'.")
+            raise ValueError("File must include 'Company' or 'Position'.")
 
-        # Infer locations from Company and Position
         def infer_location(row):
-            # Check Position for location keywords
             for keyword, country in location_mapping.items():
                 if pd.notnull(row['Position']) and keyword.lower() in row['Position'].lower():
                     return country
-
-            # Check Company for location keywords
-            for keyword, country in location_mapping.items():
                 if pd.notnull(row['Company']) and keyword.lower() in row['Company'].lower():
                     return country
-
-            # Fallback to Unknown
             return "Unknown"
 
-        # Apply the inference logic
         df['Country'] = df.apply(infer_location, axis=1)
-
-        # Count connections by inferred country
         country_counts = df['Country'].value_counts().reset_index()
         country_counts.columns = ['Country', 'Connections']
         return country_counts
 
-    except pd.errors.ParserError as e:
-        raise ValueError(f"Error parsing the cleaned CSV file: {e}")
     except Exception as e:
-        raise ValueError(f"Unexpected error while processing the file: {e}")
+        raise ValueError(f"Error processing file: {e}")
 
 # App title
 st.title("LinkedIn Connections Geographical Heat Map")
-st.write("Upload your LinkedIn connections CSV file to visualise their geographical distribution (inferred from company and position data).")
+st.write("Upload your LinkedIn connections CSV file to visualise their geographical distribution.")
 
-# File uploader
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv", key="file_uploader_1")
 
-if uploaded_file is not None:
+if uploaded_file:
     try:
-        # Process the data
         processed_data = process_data(uploaded_file)
-
-        # Create the choropleth heat map
-        st.write("Geographical Distribution of LinkedIn Connections:")
         fig = px.choropleth(
             processed_data,
             locations="Country",
             locationmode="country names",
             color="Connections",
-            title="Geographical Spread of LinkedIn Connections (Inferred)",
-            color_continuous_scale="Reds",  # Use a warm color scale
-            range_color=[1, processed_data['Connections'].max()],  # Start from 1 to ensure all countries are shown
+            title="Geographical Spread of LinkedIn Connections",
+            color_continuous_scale="Reds"
         )
         fig.update_geos(
             showcoastlines=True,
-            showland=True,
-            landcolor="LightGray",  # Background for non-connection areas
             showcountries=True,
-            countrycolor="Black",  # Outline all countries
-            showocean=False,  # Remove ocean for a clean look
+            countrycolor="Black",
+            showocean=False,
+            landcolor="White"
         )
         st.plotly_chart(fig)
-    except ValueError as ve:
-        st.error(f"Error: {ve}")
-    except Exception as e:
-        st.error(f"Unexpected error: {e}")
+    except ValueError as e:
+        st.error(str(e))
 else:
-    st.info("Please upload a file to proceed.")
+    st.info("Please upload a file.")

@@ -5,14 +5,35 @@ import plotly.express as px
 # Function to process the uploaded data
 def process_data(file):
     try:
-        df = pd.read_csv(file)
+        # Detect the delimiter and skip metadata rows
+        import csv
+        raw_data = file.getvalue().decode("utf-8")
+        
+        # Skip initial metadata rows until we find the header row
+        lines = raw_data.splitlines()
+        header_row_index = 0
+        for i, line in enumerate(lines):
+            if "First Name" in line and "Location" in line:  # Adjust for LinkedIn headers
+                header_row_index = i
+                break
+        
+        # Use the detected delimiter
+        sniffer = csv.Sniffer()
+        delimiter = sniffer.sniff(lines[header_row_index]).delimiter
+        
+        # Read the CSV starting from the header row
+        df = pd.read_csv(file, delimiter=delimiter, skiprows=header_row_index)
+        
+        # Ensure the 'Location' column exists
         if 'Location' not in df.columns:
             raise ValueError("The uploaded file does not have a 'Location' column.")
+        
+        # Count connections by location
         location_counts = df['Location'].value_counts().reset_index()
         location_counts.columns = ['Country', 'Connections']
         return location_counts
-    except pd.errors.EmptyDataError:
-        raise ValueError("The uploaded file is empty or improperly formatted.")
+    except pd.errors.ParserError as e:
+        raise ValueError(f"Error parsing the CSV file: {e}")
     except Exception as e:
         raise ValueError(f"Unexpected error while processing the file: {e}")
 

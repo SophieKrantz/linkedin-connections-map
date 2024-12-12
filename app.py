@@ -5,10 +5,13 @@ import plotly.express as px
 # Function to process the uploaded data
 def process_data(file):
     df = pd.read_csv(file)
+    if 'Location' not in df.columns:
+        raise ValueError("The uploaded file does not have a 'Location' column.")
     location_counts = df['Location'].value_counts().reset_index()
     location_counts.columns = ['Country', 'Connections']
     return location_counts
 
+# App title
 st.title("LinkedIn Connections Diversity Tool")
 st.write("Upload your LinkedIn connections CSV file to analyse geographical diversity.")
 
@@ -18,10 +21,10 @@ uploaded_file = st.file_uploader("Choose a CSV file", type="csv", key="file_uplo
 if uploaded_file is not None:
     st.write("Uploaded File Preview:")
     try:
-        # Read and display raw file content
+        # Display raw file content for debugging
         raw_data = uploaded_file.getvalue()
         st.text("Raw File Content:")
-        st.text(raw_data.decode("utf-8"))  # Display raw file content
+        st.text(raw_data.decode("utf-8"))  # Display raw file content as text
 
         # Try to parse the file as CSV
         data = pd.read_csv(uploaded_file)
@@ -33,13 +36,13 @@ if uploaded_file is not None:
             raise ValueError("The uploaded file does not have a 'Location' column.")
 
         # Process the data
-        data = process_data(uploaded_file)
+        processed_data = process_data(uploaded_file)
         st.write("Geographical Distribution:")
-        st.write(data)
+        st.write(processed_data)
 
         # Create the map visualization
         fig = px.choropleth(
-            data,
+            processed_data,
             locations="Country",
             locationmode="country names",
             color="Connections",

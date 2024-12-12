@@ -100,4 +100,34 @@ def process_data(file):
         return country_counts
 
     except Exception as e:
-        raise ValueError(f"Error processing file: {e
+        raise ValueError(f"Error processing file: {e}")
+
+# App title
+st.title("LinkedIn Connections Geographical Heat Map")
+st.write("Upload your LinkedIn connections CSV file to visualise their geographical distribution.")
+
+uploaded_file = st.file_uploader("Choose a CSV file", type="csv", key="file_uploader_1")
+
+if uploaded_file:
+    try:
+        processed_data = process_data(uploaded_file)
+        fig = px.choropleth(
+            processed_data,
+            locations="Country",
+            locationmode="country names",
+            color="Connections",
+            title="Geographical Spread of LinkedIn Connections",
+            color_continuous_scale="Reds"
+        )
+        fig.update_geos(
+            showcoastlines=True,
+            showcountries=True,
+            countrycolor="Black",
+            showocean=False,
+            landcolor="White"
+        )
+        st.plotly_chart(fig)
+    except ValueError as e:
+        st.error(str(e))
+else:
+    st.info("Please upload a file.")

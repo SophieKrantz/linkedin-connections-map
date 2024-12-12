@@ -126,17 +126,14 @@ if uploaded_file is not None:
             locationmode="country names",
             color="Connections",
             title="Geographical Spread of LinkedIn Connections (Inferred)",
-            color_continuous_scale="Oranges",  # Use a warm color scale
-            range_color=[1, processed_data['Connections'].max()],  # Adjust the range
+            color_continuous_scale="Reds",  # Use a warm color scale
+            range_color=[1, processed_data['Connections'].max()],  # Start from 1 to ensure all countries are shown
         )
         fig.update_geos(
-            showcoastlines=True,
-            coastlinecolor="LightGray",
+            showcoastlines=False,  # Remove coastline
             showland=True,
-            landcolor="White",
-            showocean=True,
-            oceancolor="LightBlue",
-            projection_type="natural earth",
+            landcolor="White",  # Background for non-connection areas
+            showocean=False,  # Remove ocean for a clean look
         )
         st.plotly_chart(fig)
     except ValueError as ve:
@@ -145,3 +142,4 @@ if uploaded_file is not None:
         st.error(f"Unexpected error: {e}")
 else:
     st.info("Please upload a file to proceed.")
+

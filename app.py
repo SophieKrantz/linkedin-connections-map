@@ -31,14 +31,14 @@ def process_data(file):
         # Read the cleaned CSV
         df = pd.read_csv(cleaned_csv)
 
-        # Ensure the required columns exist
-        if 'Company' not in df.columns or 'Position' not in df.columns:
-            raise ValueError("The uploaded file does not contain the required columns: 'Company' or 'Position'.")
+        # Ensure the 'Location' column exists
+        if 'Location' not in df.columns:
+            raise ValueError("The uploaded file does not have a 'Location' column.")
 
-        # Example: Process by counting connections by company
-        company_counts = df['Company'].value_counts().reset_index()
-        company_counts.columns = ['Company', 'Connections']
-        return company_counts
+        # Count connections by location
+        location_counts = df['Location'].value_counts().reset_index()
+        location_counts.columns = ['Country', 'Connections']
+        return location_counts
 
     except pd.errors.ParserError as e:
         raise ValueError(f"Error parsing the cleaned CSV file: {e}")
@@ -46,32 +46,26 @@ def process_data(file):
         raise ValueError(f"Unexpected error while processing the file: {e}")
 
 # App title
-st.title("LinkedIn Connections Diversity Tool")
-st.write("Upload your LinkedIn connections CSV file to analyse geographical diversity.")
+st.title("LinkedIn Connections Geographical Heat Map")
+st.write("Upload your LinkedIn connections CSV file to visualise their geographical distribution.")
 
 # File uploader
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv", key="file_uploader_1")
 
 if uploaded_file is not None:
-    st.write("Uploaded File Preview:")
     try:
-        # Display raw file content for debugging
-        raw_data = uploaded_file.getvalue()
-        st.text("Raw File Content:")
-        st.text(raw_data.decode("utf-8"))  # Display raw file content as text
-
         # Process the data
         processed_data = process_data(uploaded_file)
-        st.write("Geographical Distribution:")
-        st.write(processed_data)
 
-        # Create the map visualization
-        fig = px.bar(
+        # Create the heat map
+        st.write("Geographical Distribution of LinkedIn Connections:")
+        fig = px.choropleth(
             processed_data,
-            x="Company",
-            y="Connections",
-            title="Connections by Company",
-            labels={"Connections": "Number of Connections"},
+            locations="Country",
+            locationmode="country names",
+            color="Connections",
+            title="Geographical Spread of LinkedIn Connections",
+            color_continuous_scale="Viridis"
         )
         st.plotly_chart(fig)
     except ValueError as ve:

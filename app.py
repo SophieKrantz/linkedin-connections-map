@@ -4,12 +4,17 @@ import plotly.express as px
 
 # Function to process the uploaded data
 def process_data(file):
-    df = pd.read_csv(file)
-    if 'Location' not in df.columns:
-        raise ValueError("The uploaded file does not have a 'Location' column.")
-    location_counts = df['Location'].value_counts().reset_index()
-    location_counts.columns = ['Country', 'Connections']
-    return location_counts
+    try:
+        df = pd.read_csv(file)
+        if 'Location' not in df.columns:
+            raise ValueError("The uploaded file does not have a 'Location' column.")
+        location_counts = df['Location'].value_counts().reset_index()
+        location_counts.columns = ['Country', 'Connections']
+        return location_counts
+    except pd.errors.EmptyDataError:
+        raise ValueError("The uploaded file is empty or improperly formatted.")
+    except Exception as e:
+        raise ValueError(f"Unexpected error while processing the file: {e}")
 
 # App title
 st.title("LinkedIn Connections Diversity Tool")
@@ -26,14 +31,10 @@ if uploaded_file is not None:
         st.text("Raw File Content:")
         st.text(raw_data.decode("utf-8"))  # Display raw file content as text
 
-        # Try to parse the file as CSV
+        # Parse the file as CSV
         data = pd.read_csv(uploaded_file)
         st.write("Parsed File Content:")
         st.write(data)  # Display parsed data for debugging
-
-        # Check if 'Location' column exists
-        if 'Location' not in data.columns:
-            raise ValueError("The uploaded file does not have a 'Location' column.")
 
         # Process the data
         processed_data = process_data(uploaded_file)
@@ -50,8 +51,9 @@ if uploaded_file is not None:
             color_continuous_scale="Viridis"
         )
         st.plotly_chart(fig)
+    except ValueError as ve:
+        st.error(f"Error: {ve}")
     except Exception as e:
-        # Display detailed error messages
-        st.error(f"Error reading file or processing data: {e}")
+        st.error(f"Unexpected error: {e}")
 else:
     st.info("Please upload a file to proceed.")

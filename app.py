@@ -6,21 +6,8 @@ import io
 
 # Function to process the uploaded data
 def process_data(file):
-    # Example mapping of companies to headquarters
-    company_headquarters = {
-        "Google": "United States",
-        "Microsoft": "United States",
-        "Amazon": "United States",
-        "Tencent": "China",
-        "Tata Consultancy Services": "India",
-        "BMW": "Germany",
-        "Unilever": "United Kingdom",
-        "Toyota": "Japan",
-        "Volkswagen": "Germany",
-    }
-
-    # List of location keywords (countries, cities, and regions)
-    location_keywords = {
+    # Comprehensive mapping of countries, major cities, states, and regions
+    location_mapping = {
         # Countries
         "Australia": "Australia",
         "India": "India",
@@ -31,20 +18,45 @@ def process_data(file):
         "UK": "United Kingdom",
         "New Zealand": "New Zealand",
         "Canada": "Canada",
+        "Brazil": "Brazil",
+        "South Africa": "South Africa",
+        "Russia": "Russia",
+        "France": "France",
+        "Italy": "Italy",
+        "Spain": "Spain",
+        "Mexico": "Mexico",
+        "Indonesia": "Indonesia",
+        "Nigeria": "Nigeria",
 
-        # Cities
+        # Major Cities
         "London": "United Kingdom",
         "Geneva": "Switzerland",
         "Sydney": "Australia",
         "Melbourne": "Australia",
         "Munich": "Germany",
+        "Berlin": "Germany",
         "Shanghai": "China",
+        "Beijing": "China",
+        "New York": "United States",
+        "Los Angeles": "United States",
+        "Paris": "France",
+        "Rome": "Italy",
+        "Moscow": "Russia",
+        "Tokyo": "Japan",
+        "Rio de Janeiro": "Brazil",
 
-        # Regions
-        "Asia": "Asia",
-        "Europe": "Europe",
-        "North America": "North America",
+        # States and Regions
+        "California": "United States",
+        "Texas": "United States",
+        "Victoria": "Australia",
+        "Queensland": "Australia",
+        "Bavaria": "Germany",
+        "Ontario": "Canada",
+        "Quebec": "Canada",
         "Africa": "Africa",
+        "Europe": "Europe",
+        "Asia": "Asia",
+        "North America": "North America",
         "Latin America": "Latin America",
         "Middle East": "Middle East",
     }
@@ -81,17 +93,17 @@ def process_data(file):
         # Infer locations from Company and Position
         def infer_location(row):
             # Check Position for location keywords
-            for keyword, country in location_keywords.items():
+            for keyword, country in location_mapping.items():
                 if pd.notnull(row['Position']) and keyword.lower() in row['Position'].lower():
                     return country
 
             # Check Company for location keywords
-            for keyword, country in location_keywords.items():
+            for keyword, country in location_mapping.items():
                 if pd.notnull(row['Company']) and keyword.lower() in row['Company'].lower():
                     return country
 
-            # Fallback to Company headquarters mapping
-            return company_headquarters.get(row['Company'], "Unknown")
+            # Fallback to Unknown
+            return "Unknown"
 
         # Apply the inference logic
         df['Country'] = df.apply(infer_location, axis=1)
@@ -130,9 +142,11 @@ if uploaded_file is not None:
             range_color=[1, processed_data['Connections'].max()],  # Start from 1 to ensure all countries are shown
         )
         fig.update_geos(
-            showcoastlines=False,  # Remove coastline
+            showcoastlines=True,
             showland=True,
-            landcolor="White",  # Background for non-connection areas
+            landcolor="LightGray",  # Background for non-connection areas
+            showcountries=True,
+            countrycolor="Black",  # Outline all countries
             showocean=False,  # Remove ocean for a clean look
         )
         st.plotly_chart(fig)
@@ -142,4 +156,3 @@ if uploaded_file is not None:
         st.error(f"Unexpected error: {e}")
 else:
     st.info("Please upload a file to proceed.")
-

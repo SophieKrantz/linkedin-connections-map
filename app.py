@@ -13,15 +13,19 @@ st.title("LinkedIn Connections Diversity Tool")
 st.write("Upload your LinkedIn connections CSV file to analyse geographical diversity.")
 
 # File uploader
-uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+uploaded_file = st.file_uploader("Choose a CSV file", type="csv", key="file_uploader_1")
 
 if uploaded_file is not None:
     st.write("Uploaded File Preview:")
     try:
-        # Display the file content for debugging
+        # Read and display the raw file content
+        raw_data = uploaded_file.getvalue()
+        st.text(raw_data.decode("utf-8"))  # Display raw file content as text (debugging)
+
+        # Attempt to read the file as a CSV
         data = pd.read_csv(uploaded_file)
-        st.write(data)
-        
+        st.write(data)  # Display parsed data for debugging
+
         # Process the data
         data = process_data(uploaded_file)
         st.write("Geographical Distribution:")
@@ -38,7 +42,7 @@ if uploaded_file is not None:
         )
         st.plotly_chart(fig)
     except Exception as e:
-        # Display the error message if something goes wrong
+        # Display detailed error messages
         st.error(f"Error reading file or processing data: {e}")
 else:
     st.info("Please upload a file to proceed.")

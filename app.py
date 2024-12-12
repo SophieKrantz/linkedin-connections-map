@@ -1,12 +1,11 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import csv
+import io
 
 # Function to process the uploaded data
 def process_data(file):
-    import csv
-    import io
-
     try:
         # Read the raw file content
         raw_data = file.getvalue().decode("utf-8")
@@ -43,26 +42,6 @@ def process_data(file):
 
     except pd.errors.ParserError as e:
         raise ValueError(f"Error parsing the cleaned CSV file: {e}")
-    except Exception as e:
-        raise ValueError(f"Unexpected error while processing the file: {e}")
-        
-        # Use the detected delimiter
-        sniffer = csv.Sniffer()
-        delimiter = sniffer.sniff(lines[header_row_index]).delimiter
-        
-        # Read the CSV starting from the header row
-        df = pd.read_csv(file, delimiter=delimiter, skiprows=header_row_index)
-        
-        # Ensure the 'Location' column exists
-        if 'Location' not in df.columns:
-            raise ValueError("The uploaded file does not have a 'Location' column.")
-        
-        # Count connections by location
-        location_counts = df['Location'].value_counts().reset_index()
-        location_counts.columns = ['Country', 'Connections']
-        return location_counts
-    except pd.errors.ParserError as e:
-        raise ValueError(f"Error parsing the CSV file: {e}")
     except Exception as e:
         raise ValueError(f"Unexpected error while processing the file: {e}")
 

@@ -52,11 +52,6 @@ if uploaded_file is not None:
         st.text("Raw File Content:")
         st.text(raw_data.decode("utf-8"))  # Display raw file content as text
 
-        # Parse the file as CSV
-        data = pd.read_csv(uploaded_file)
-        st.write("Parsed File Content:")
-        st.write(data)  # Display parsed data for debugging
-
         # Process the data
         processed_data = process_data(uploaded_file)
         st.write("Geographical Distribution:")

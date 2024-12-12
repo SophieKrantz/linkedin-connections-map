@@ -10,17 +10,14 @@ def process_data(file):
         # Read the raw file content
         raw_data = file.getvalue().decode("utf-8")
 
-        # Split lines and find the header
+        # Split lines to skip metadata notes
         lines = raw_data.splitlines()
-        if not lines:
-            raise ValueError("The uploaded file is empty.")
-
         cleaned_lines = []
         header_found = False
 
         for line in lines:
-            # Look for the header row containing "First Name" and "Location"
-            if not header_found and "First Name" in line and "Location" in line:
+            # Look for the header row starting with "First Name"
+            if not header_found and "First Name" in line:
                 header_found = True  # Header row identified
             if header_found:
                 cleaned_lines.append(line)  # Keep rows after the header
@@ -31,21 +28,17 @@ def process_data(file):
         # Convert cleaned lines into a file-like object
         cleaned_csv = io.StringIO("\n".join(cleaned_lines))
 
-        # Detect the delimiter
-        sniffer = csv.Sniffer()
-        delimiter = sniffer.sniff(cleaned_lines[0]).delimiter
-
         # Read the cleaned CSV
-        df = pd.read_csv(cleaned_csv, delimiter=delimiter)
+        df = pd.read_csv(cleaned_csv)
 
-        # Ensure the 'Location' column exists
-        if 'Location' not in df.columns:
-            raise ValueError("The uploaded file does not have a 'Location' column.")
+        # Ensure the required columns exist
+        if 'Company' not in df.columns or 'Position' not in df.columns:
+            raise ValueError("The uploaded file does not contain the required columns: 'Company' or 'Position'.")
 
-        # Count connections by location
-        location_counts = df['Location'].value_counts().reset_index()
-        location_counts.columns = ['Country', 'Connections']
-        return location_counts
+        # Example: Process by counting connections by company
+        company_counts = df['Company'].value_counts().reset_index()
+        company_counts.columns = ['Company', 'Connections']
+        return company_counts
 
     except pd.errors.ParserError as e:
         raise ValueError(f"Error parsing the cleaned CSV file: {e}")
@@ -73,13 +66,12 @@ if uploaded_file is not None:
         st.write(processed_data)
 
         # Create the map visualization
-        fig = px.choropleth(
+        fig = px.bar(
             processed_data,
-            locations="Country",
-            locationmode="country names",
-            color="Connections",
-            title="Geographical Spread of LinkedIn Connections",
-            color_continuous_scale="Viridis"
+            x="Company",
+            y="Connections",
+            title="Connections by Company",
+            labels={"Connections": "Number of Connections"},
         )
         st.plotly_chart(fig)
     except ValueError as ve:

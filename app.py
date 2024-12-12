@@ -4,18 +4,47 @@ import plotly.express as px
 
 # Function to process the uploaded data
 def process_data(file):
+    import csv
+    import io
+
     try:
-        # Detect the delimiter and skip metadata rows
-        import csv
+        # Read the raw file content
         raw_data = file.getvalue().decode("utf-8")
-        
-        # Skip initial metadata rows until we find the header row
+
+        # Split lines and find the header
         lines = raw_data.splitlines()
-        header_row_index = 0
-        for i, line in enumerate(lines):
-            if "First Name" in line and "Location" in line:  # Adjust for LinkedIn headers
-                header_row_index = i
-                break
+        cleaned_lines = []
+        header_found = False
+
+        for line in lines:
+            if not header_found and "First Name" in line and "Location" in line:
+                header_found = True  # Header row identified
+            if header_found:
+                cleaned_lines.append(line)  # Keep rows after the header
+
+        # Convert cleaned lines into a file-like object
+        cleaned_csv = io.StringIO("\n".join(cleaned_lines))
+
+        # Detect the delimiter
+        sniffer = csv.Sniffer()
+        delimiter = sniffer.sniff(cleaned_lines[0]).delimiter
+
+        # Read the cleaned CSV
+        df = pd.read_csv(cleaned_csv, delimiter=delimiter)
+
+        # Ensure the 'Location' column exists
+        if 'Location' not in df.columns:
+            raise ValueError("The uploaded file does not have a 'Location' column.")
+
+        # Count connections by location
+        location_counts = df['Location'].value_counts().reset_index()
+        location_counts.columns = ['Country', 'Connections']
+        return location_counts
+
+    except pd.errors.ParserError as e:
+        raise ValueError(f"Error parsing the cleaned CSV file: {e}")
+    except Exception as e:
+        raise ValueError(f"Unexpected error while processing the file: {e}")
         
         # Use the detected delimiter
         sniffer = csv.Sniffer()

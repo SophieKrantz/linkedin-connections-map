@@ -56,16 +56,16 @@ def process_data(file):
     ]
 
     # Combine countries and cities into location mapping
-    location_mapping = {city: country for city in cities for country in countries}
+    location_mapping = {city.lower(): country for city in cities for country in countries}
 
     location_mapping.update({
-        "Africa": "Africa",
-        "Asia": "Asia",
-        "Europe": "Europe",
-        "North America": "North America",
-        "Latin America": "Latin America",
-        "Middle East": "Middle East",
-        "Oceania": "Oceania"
+        "africa": "Africa",
+        "asia": "Asia",
+        "europe": "Europe",
+        "north america": "North America",
+        "latin america": "Latin America",
+        "middle east": "Middle East",
+        "oceania": "Oceania"
     })
 
     try:

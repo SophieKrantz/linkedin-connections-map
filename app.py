@@ -12,14 +12,21 @@ def process_data(file):
 
         # Split lines and find the header
         lines = raw_data.splitlines()
+        if not lines:
+            raise ValueError("The uploaded file is empty.")
+
         cleaned_lines = []
         header_found = False
 
         for line in lines:
+            # Look for the header row containing "First Name" and "Location"
             if not header_found and "First Name" in line and "Location" in line:
                 header_found = True  # Header row identified
             if header_found:
                 cleaned_lines.append(line)  # Keep rows after the header
+
+        if not cleaned_lines:
+            raise ValueError("The file does not contain a valid header or data rows.")
 
         # Convert cleaned lines into a file-like object
         cleaned_csv = io.StringIO("\n".join(cleaned_lines))

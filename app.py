@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import csv
 import io
+import re
 
 # Function to process the uploaded data
 def process_data(file):
@@ -49,24 +50,18 @@ def process_data(file):
         "Kolkata", "Pune", "Ahmedabad", "Surat", "Kanpur", "Jaipur", "Lucknow", "Nagpur",
         "Indore", "Patna", "Bhopal", "Vadodara", "Ludhiana", "Agra", "Thiruvananthapuram",
         "Coimbatore", "Kochi", "Mysore", "Guwahati", "Shillong", "Panaji", "Port Moresby",
-        "Suva", "Apia", "Tonga", "Port Vila", "Honiara", "Nuku'alofa", "Majuro", "Funafuti",
-        "Fukuoka", "Sendai", "Nagano", "Kobe", "Himeji", "Kyushu", "Vladivostok", "Kaliningrad",
-        "Sarajevo", "Skopje", "Podgorica", "Pristina", "Tirana", "Erevan", "Tbilisi", "Bishkek",
-        "Astana", "Ashgabat", "Ulaanbaatar", "Male", "Tashkent", "Dushanbe"
+        "Suva", "Apia", "Tonga", "Port Vila", "Honiara", "Nuku'alofa", "Majuro", "Funafuti"
     ]
 
     # Combine countries and cities into location mapping
     location_mapping = {city.lower(): country for city in cities for country in countries}
 
-    location_mapping.update({
-        "africa": "Africa",
-        "asia": "Asia",
-        "europe": "Europe",
-        "north america": "North America",
-        "latin america": "Latin America",
-        "middle east": "Middle East",
-        "oceania": "Oceania"
-    })
+    # Map country codes to full names
+    domain_to_country = {
+        "au": "Australia", "uk": "United Kingdom", "nz": "New Zealand", "ca": "Canada",
+        "us": "United States", "de": "Germany", "fr": "France", "in": "India",
+        "jp": "Japan", "cn": "China", "br": "Brazil", "za": "South Africa", "ng": "Nigeria"
+    }
 
     try:
         # Read the file content
@@ -83,51 +78,26 @@ def process_data(file):
         df = pd.read_csv(cleaned_csv)
 
         # Ensure required columns
-        if 'Company' not in df.columns or 'Position' not in df.columns:
-            raise ValueError("File must include 'Company' or 'Position'.")
+        if 'Email Address' not in df.columns:
+            raise ValueError("File must include 'Email Address'.")
 
+        # Function to infer location
         def infer_location(row):
-            for keyword, country in location_mapping.items():
-                if pd.notnull(row['Position']) and keyword.lower() in row['Position'].lower():
-                    return country
-                if pd.notnull(row['Company']) and keyword.lower() in row['Company'].lower():
-                    return country
+            # Check email address for domain-based location
+            if pd.notnull(row.get("Email Address")):
+                match = re.search(r"\.([a-z]{2})$", row["Email Address"])
+                if match:
+                    country_code = match.group(1).lower()
+                    if country_code in domain_to_country:
+                        return domain_to_country[country_code]
+
             return "Unknown"
 
+        # Apply location inference
         df['Country'] = df.apply(infer_location, axis=1)
         country_counts = df['Country'].value_counts().reset_index()
         country_counts.columns = ['Country', 'Connections']
         return country_counts
 
     except Exception as e:
-        raise ValueError(f"Error processing file: {e}")
-
-# App title
-st.title("LinkedIn Connections Geographical Heat Map")
-st.write("Upload your LinkedIn connections CSV file to visualise their geographical distribution.")
-
-uploaded_file = st.file_uploader("Choose a CSV file", type="csv", key="file_uploader_1")
-
-if uploaded_file:
-    try:
-        processed_data = process_data(uploaded_file)
-        fig = px.choropleth(
-            processed_data,
-            locations="Country",
-            locationmode="country names",
-            color="Connections",
-            title="Geographical Spread of LinkedIn Connections",
-            color_continuous_scale="Reds"
-        )
-        fig.update_geos(
-            showcoastlines=True,
-            showcountries=True,
-            countrycolor="Black",
-            showocean=False,
-            landcolor="White"
-        )
-        st.plotly_chart(fig)
-    except ValueError as e:
-        st.error(str(e))
-else:
-    st.info("Please upload a file.")
+        raise ValueError(f"Error processing file: {e

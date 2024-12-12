@@ -14,3 +14,32 @@ st.write("Upload your LinkedIn connections CSV file to analyse geographical dive
 
 # File uploader
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+
+if uploaded_file is not None:
+    st.write("Uploaded File Preview:")
+    try:
+        # Display the file content for debugging
+        data = pd.read_csv(uploaded_file)
+        st.write(data)
+        
+        # Process the data
+        data = process_data(uploaded_file)
+        st.write("Geographical Distribution:")
+        st.write(data)
+
+        # Create the map visualization
+        fig = px.choropleth(
+            data,
+            locations="Country",
+            locationmode="country names",
+            color="Connections",
+            title="Geographical Spread of LinkedIn Connections",
+            color_continuous_scale="Viridis"
+        )
+        st.plotly_chart(fig)
+    except Exception as e:
+        # Display the error message if something goes wrong
+        st.error(f"Error reading file or processing data: {e}")
+else:
+    st.info("Please upload a file to proceed.")

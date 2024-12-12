@@ -13,4 +13,4 @@ st.title("LinkedIn Connections Diversity Tool")
 st.write("Upload your LinkedIn connections CSV file to analyse geographical diversity.")
 
 # File uploader
-uploaded_file = st.file_up
+uploaded_file = st.file_uploader("Choose a CSV file", type="csv")

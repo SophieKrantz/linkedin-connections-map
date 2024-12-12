@@ -14,7 +14,6 @@ st.write("Upload your LinkedIn connections CSV file to analyse geographical dive
 
 # File uploader
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 
 if uploaded_file is not None:
     st.write("Uploaded File Preview:")

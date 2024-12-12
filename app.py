@@ -31,12 +31,19 @@ def process_data(file):
         # Read the cleaned CSV
         df = pd.read_csv(cleaned_csv)
 
-        # Ensure the 'Location' column exists
-        if 'Location' not in df.columns:
-            raise ValueError("The uploaded file does not have a 'Location' column.")
+        # Attempt to find a column that could represent location
+        possible_columns = ['Location', 'Country', 'City', 'Region']
+        location_column = None
+        for col in possible_columns:
+            if col in df.columns:
+                location_column = col
+                break
 
-        # Count connections by location
-        location_counts = df['Location'].value_counts().reset_index()
+        if not location_column:
+            raise ValueError("The uploaded file does not have a column for geographic data (e.g., 'Location', 'Country').")
+
+        # Count connections by the detected location column
+        location_counts = df[location_column].value_counts().reset_index()
         location_counts.columns = ['Country', 'Connections']
         return location_counts
 
